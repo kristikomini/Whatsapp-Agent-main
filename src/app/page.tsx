@@ -3,11 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { CalendarDays, CalendarClock, Sparkles, Users, ArrowRight, Bot, User, MessageSquare, Plus } from "lucide-react";
+import { CalendarDays, CalendarClock, Sparkles, Users, ArrowRight, Bot, User, MessageSquare, Plus, Activity, BellRing, CheckCircle2, AlertTriangle } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui";
 import { Delta } from "@/components/kit";
-import type { OverviewStats, AppointmentWithRelations } from "@/lib/gestionale-types";
+import type { OverviewStats, AppointmentWithRelations, AiHealth, ReminderStatus } from "@/lib/gestionale-types";
 import type { ConversationWithLastMessage } from "@/lib/types";
 
 const TZ = "Europe/Rome";
@@ -167,6 +167,9 @@ export default function OverviewPage() {
                   </div>
                 )}
               </Card>
+
+              {/* Operations: agent health + reminders */}
+              <OperationsPanel ai={stats?.ai} reminders={stats?.reminders} />
 
               {/* Next 7 days */}
               <Card className="p-5">

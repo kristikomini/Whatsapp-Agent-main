@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { supabase } from "@/lib/supabase";
 import { sendWhatsAppMessage, sendTypingIndicator, notifyStaff } from "@/lib/whatsapp";
 import { getAIResponse } from "@/lib/ai";
+import { recordAiOk, recordAiFailure } from "@/lib/ai-health";
 
 /** Verify Meta's X-Hub-Signature-256 header against the raw request body. */
 export function verifySignature(
@@ -230,9 +231,11 @@ async function generateAndSendReply(snap: ReplySnapshot): Promise<void> {
         now: new Date(),
       }
     );
+    recordAiOk(); // health signal: the assistant answered a customer
   } catch (err) {
     console.error("getAIResponse failed:", err);
     aiResponse = AI_FALLBACK;
+    recordAiFailure(err); // health signal: surfaced on the dashboard + /api/health
     alertStaffAiDown(phone, err); // let staff know the assistant is down
   }
 

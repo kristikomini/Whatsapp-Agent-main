@@ -11,6 +11,23 @@ export interface ServiceRow extends Service {
   category: string | null;
 }
 
+/** WhatsApp AI agent health (from the in-memory signal the webhook updates). */
+export interface AiHealth {
+  status: "ok" | "down" | "unknown";
+  lastOkAt: string | null;
+  lastFailAt: string | null;
+  lastError: string | null;
+}
+
+/** Read-only reminder-job status surfaced on the dashboard. */
+export interface ReminderStatus {
+  pending: number;
+  sentLast24h: number;
+  lastRun: { at: string; sent: number; considered: number; trigger: "cron" | "auto" | "manual" } | null;
+  windowFromH: number;
+  windowToH: number;
+}
+
 /** Overview KPIs for the dashboard home. */
 export interface OverviewStats {
   todayCount: number;
@@ -21,6 +38,8 @@ export interface OverviewStats {
   today: AppointmentWithRelations[];
   /** Real period-over-period deltas as percentage change; null = no prior-period base. */
   deltas?: { today: number | null; upcoming: number | null };
+  ai?: AiHealth;
+  reminders?: ReminderStatus;
 }
 
 export interface ProductRow {

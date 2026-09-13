@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { SALON } from "@/lib/salon-config";
 import { zonedWallTimeToUtc, getZonedParts } from "@/lib/timezone";
+import { getAiHealth } from "@/lib/ai-health";
+import { getReminderStatus } from "@/lib/reminders";
 
 const SELECT = "*, service:services(name,duration_min,price_cents), stylist:stylists(name)";
 
@@ -42,6 +44,11 @@ export async function GET() {
     week.push({ date: s.toISOString(), label: dayNames[parts.weekday], count });
   }
 
+  // Agent health (in-memory signal) + reminder status (read-only counts) for
+  // the dashboard's "operations" panel. Reminders never send from here.
+  const reminders = await getReminderStatus();
+  const ai = getAiHealth();
+
   const todayCount = today.data?.length ?? 0;
   const upcomingCount = upcoming.count ?? 0;
 
@@ -58,6 +65,8 @@ export async function GET() {
     conversations: convos.count ?? 0,
     today: today.data ?? [],
     week,
+    ai,
+    reminders,
     // Real period-over-period deltas (percentage change).
     deltas: {
       today: pct(todayCount, todayLastWeek.count ?? 0),    // vs same weekday last week
